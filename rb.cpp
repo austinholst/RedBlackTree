@@ -182,6 +182,7 @@ Node* uncle(Node* n) {
 
 //Rotate to the left 
 void rotate_left(Node* &head, Node* n) {
+  cout << "ROTATE LEFT" << endl;
   Node* nNew = n->right;
   //Make sure nNew is not a leaf
   if(nNew != NULL) {
@@ -199,12 +200,14 @@ void rotate_left(Node* &head, Node* n) {
     }
     if(n == head) {
       head = nNew;
+      head->color = BLACK;
     }
   }
 }
 
 //Rotate to the right
 void rotate_right(Node* &head, Node* n) {
+  cout << "ROTATE RIGHT" << endl;
   Node* nNew = n->left;
   //Make sure nNew is not a leaf
   if(nNew != NULL) {
@@ -226,13 +229,14 @@ void rotate_right(Node* &head, Node* n) {
     //if you swapped out the head then change it
     if(n == head) {
       head = nNew;
+      head->color = BLACK;
     }
   }
 }
 
 //Put the new node into the tree
 void insert(Node* &head, Node* n) {
-  insert_recurse(head, n);  
+  insert_recurse(head, n);
   //repair the tree in case any of the red-black properties have been violated
   insert_repair_tree(head, n);
    
@@ -266,11 +270,13 @@ void insert_recurse(Node* &head, Node* n) {
   }
   //If n is greater than head
   else {
+    cout << "TEST" << endl;
     if(head->right != NULL) {
       insert_recurse(head->right, n);
       return;
     }
     else {
+      cout << "TEST 2" << endl;
       head->right = n;
       //insert the n node
       n->parent = head;
@@ -301,28 +307,34 @@ void insert_repair_tree(Node* &head, Node* n) {
 //if the node entered is the head then make it black
 void case1(Node* &head, Node* n) {
   if(n->parent == NULL) {
+    cout << "CASE 1" << endl;
     n->color = BLACK;
   }
 }
 
 //if the node entered has a black parent then you are all gucci
 void case2(Node* &head, Node* n) {
+  cout << "CASE 2" << endl;
   return;
 }
 
 //Parent and uncle are red
 void case3(Node* &head, Node* n) {
+  cout << "CASE 3" << endl;
   parent(n)->color = BLACK;
   uncle(n)->color = BLACK;
-  grandparent(n)->color = RED;
+  if(grandparent(n) != head) {
+    grandparent(n)->color = RED;
+  }
   insert_repair_tree(head, grandparent(n));
 }
 
 //Basically every other possibility
 void case4(Node* &head, Node* n) {
+  cout << "CASE 4" << endl;
   Node* p = parent(n);
   Node* g = grandparent(n);
-  
+  print(head, 0);
   
   if(g->left != NULL && g->left->right != NULL && n == g->left->right) {
     print(head, 0);
@@ -338,16 +350,22 @@ void case4(Node* &head, Node* n) {
   }
   else if(g->right != NULL && g->right->right !=NULL && n == g->right->right) {
     if(g == head) {
+      cout << "G IS HEAD" << endl;
       if(p-> left != NULL) {
 	g->right = p->left;
 	p->left->parent = g;
 	g->parent = p;
       }
       else {
+	cout << "here" << endl;
 	g->parent = p;
       }
+      cout << "Test 1111" << endl;
+      g->right = p->left;
       p->left = g;
       head = p;
+      p->right = n;
+      n->parent = p;
       p->color = BLACK;
       g->color = RED;
     }
@@ -380,6 +398,7 @@ void case4(Node* &head, Node* n) {
 
 //rotates to the right or the left around the grandparent is needed and changes color
 void case4Part2(Node* &head, Node* n) {
+  cout << "CASE 4 Part 2" << endl;
   cout << "Case 4 part 2 Head: " << head->data << endl;
   Node* p = parent(n);
   Node* g = grandparent(n);
