@@ -6,7 +6,7 @@
 using namespace std;
 
 /* Author: Austin Holst
- * Date: A long time from now
+ * Date: 4 - 30 - 18
  * Code: Creates and prints out a red black data tree from user input
  */
 
@@ -342,7 +342,6 @@ void case4(Node* &head, Node* n) {
     print(head, 0);
   }
   else if(g->right != NULL && g->right->left != NULL && n == g->right->left) {
-    print(head, 0);
     rotate_right(head, p);
     n = n->right;
     case4Part2(head, n);
@@ -350,7 +349,6 @@ void case4(Node* &head, Node* n) {
   }
   else if(g->right != NULL && g->right->right !=NULL && n == g->right->right) {
     if(g == head) {
-      cout << "G IS HEAD" << endl;
       if(p-> left != NULL) {
 	g->right = p->left;
 	p->left->parent = g;
