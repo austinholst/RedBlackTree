@@ -85,7 +85,8 @@ int main() {
 	    length++;
 	    i++;
 	  }
-	  char* charNum = new char[length];
+	  char* charNum = new char[length + 1];
+	  charNum[length] = '\0';
 	  for(int j = 0; j < length; j++) {
 	    charNum[j] = input[start + j];
 	  }
