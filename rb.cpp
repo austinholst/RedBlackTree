@@ -37,7 +37,6 @@ void case2(Node* &head, Node* n);
 void case3(Node* &head, Node* n);
 void case4(Node* &head, Node* n);
 void case4Part2(Node* &head, Node* n);
-void search(Node* head, int number, int counter);
 Node* searchReturn(Node* head, int number);
 Node* replace_node(Node* n, Node* child);
 Node* remove(Node* head, int removing);
@@ -47,7 +46,8 @@ bool isBlack(Node* n);
 //Constants for red or black
 const int BLACK = 0;
 const int RED = 1;
-
+const int LEFT = 1;
+const int RIGHT = 2;
 //Head declaration
 Node* head = new Node;
 
@@ -124,7 +124,12 @@ int main() {
       int number;
       cout << "What number do you want to search for?" << endl;
       cin >> number;
-      search(head, number, counter);
+      if(searchReturn(head, number) == NULL) {
+	cout << "That number is not in the tree" << endl;
+      }
+      else {
+	cout << "That number is in the tree" << endl;
+      }
     }
     else if(strcmp(answer, "delete") == 0) {
       int number;
@@ -132,7 +137,7 @@ int main() {
       cin >> number;
       head = remove(head, number);
       
-      if(head == NULL || head->data == 0) {
+      if(head == NULL) {
 	delete head;
 	head = NULL;
 	break;
@@ -433,38 +438,30 @@ void case4Part2(Node* &head, Node* n) {
   g->color = RED;
 }
 
-//Searches for a number in the tree             
-void search(Node* head, int number, int counter) {
-  int num = 0;
-  if(head != NULL) {
-    if(head->data == number) {
-      cout << "That number is in the tree" << endl;
-    }
-    else {
-      if(num == counter) {
-	cout << "That number is not in the tree" << endl;
-	return;
-      }
-      else {
-	search(head->left, number, counter);
-	num++;
-	search(head->right, number, counter);
-	num++;
-      }
-    }
-  }
-}
 
 //Returns the searched for number in the tree
 Node* searchReturn(Node* head, int number) {
-  if(head->data == number) {
+  //If the number is bigger than head go right
+  if(number > head->data) {
+    //If heads right is not null then recursively go there
+    if(head->right != NULL) {
+      return searchReturn(head->right, number);
+    }
+    //if it is null then the number is not in the tree
+    else {
+      return NULL;
+    }
+  }
+  else if(number == head->data) {
     return head;
   }
-  if(number > head->data) {
-    return searchReturn(head->right, number);
-  }
-  else {
-    return searchReturn(head->left, number);
+  else if(number < head->data) {
+    if(head->left != NULL) {
+      return searchReturn(head->left, number);
+    }
+    else {
+      return NULL;
+    }
   }
 }
 
@@ -513,10 +510,12 @@ bool isBlack(Node* n) {
 
 //removes the node from the tree
 void removal(Node* n, int side) {
+  cout << "REMOVAL" << endl;
   //if then node being removed is the root, special case
   if(side != 0) {
     //if the sibling is red
     if(isBlack(sibling(n)) == false) {
+      cout << "YOU ARE HERE" << endl;
       //switch the parent and sibling colors
       sibling(n)->color = BLACK;
       parent(n)->color = RED;
@@ -591,11 +590,15 @@ void removal(Node* n, int side) {
 
 //returns the tree after removing
 Node* remove(Node* head, int removing) {
+  cout << "REMOVE" << endl;
   Node* deleting = searchReturn(head, removing);
+  cout << "deleting: " << deleting->data << endl;
   
   if(deleting != NULL) {
+    cout << "Test 1" << endl;
     //If there are two children for the node being deleted
     if(deleting->right != NULL && deleting->left != NULL) {
+      cout << "Test 2" << endl;
       //Find the next smallest number
       Node* replacement = deleting->left;
       while(replacement->right != NULL) {
@@ -609,25 +612,28 @@ Node* remove(Node* head, int removing) {
     int side = 0;
     //find if deleting is left or right child (2 = left, 1 = right)
     if(parent(deleting) != NULL) {
+      cout << "Test 3"<< endl;
       if(deleting == parent(deleting)->right) {
-	side = 2;
+	side = RIGHT;
       }
       else {
-	side = 1;
+	side = LEFT;
       }
     }
 
     //if deleting is red, it can be deleted
     if(isBlack(deleting) == false) {
-      if(side == 1) {
+      cout << "Test 4" << endl;
+      if(side == RIGHT) {
 	parent(deleting)->right = NULL;
       }
-      else if(side == 2) {
+      else if(side == LEFT) {
 	parent(deleting)->left = NULL;
       }
     }
     //deleting is black with two kids
     else if(deleting->right != NULL || deleting->left != NULL) {
+      cout << "Test 5" << endl;
       //child is whichever child of deleting isn't null
       Node* child = new Node;
       if(deleting->right != NULL) {
@@ -642,6 +648,7 @@ Node* remove(Node* head, int removing) {
     }
     //deleting is black with no kids
     else {
+      cout << "Test 6" << endl;
       removal(deleting, side);
     }
     
@@ -652,12 +659,16 @@ Node* remove(Node* head, int removing) {
     }
     //if its not you can delete it
     else {
-      if(side == 2 && parent(deleting) != NULL) {
+      cout << "Test 7" << endl;
+      if(side == RIGHT && parent(deleting) != NULL) {
+	cout << "Test 8" << endl;
 	parent(deleting)->right = NULL;
       }
-      else if(side == 1 && parent(deleting) != NULL) {
+      else if(side == LEFT && parent(deleting) != NULL) {
+	cout << "Test 9" << endl;
 	parent(deleting)->left = NULL;
       }
+      cout << "Test 10" << endl;
       delete deleting;
     }
   }
