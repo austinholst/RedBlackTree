@@ -42,13 +42,6 @@ Node* searchReturn(Node* head, int number);
 Node* replace_node(Node* n, Node* child);
 Node* remove(Node* head, int removing);
 void removal(Node* n, int side);
-//void delete_one_child(Node* &head, Node* n);
-//void delete_case1(Node* &head, Node* n);
-//void delete_case2(Node* &head, Node* n);
-//void delete_case3(Node* &head, Node* n);
-//void delete_case4(Node* &head, Node* n);
-//void delete_case5(Node* &head, Node* n);
-//void delete_case6(Node* &head, Node* n);
 Node* findPre(Node* n);
 bool isBlack(Node* n);
 //Constants for red or black
