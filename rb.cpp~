@@ -7,8 +7,7 @@ using namespace std;
 
 /* Author: Austin Holst
  * Date: 4 - 30 - 18
- * Code: Creates and prints out a red black data tree from user input. Let's you delete any nodes that you want.
- * Note: Big shout out to Raveen for helping me with delete
+ * Code: Creates and prints out a red black data tree from user input
  */
 
 
@@ -38,19 +37,7 @@ void case3(Node* &head, Node* n);
 void case4(Node* &head, Node* n);
 void case4Part2(Node* &head, Node* n);
 void search(Node* head, int number, int counter);
-Node* searchReturn(Node* head, int number);
-Node* replace_node(Node* n, Node* child);
-Node* remove(Node* head, int removing);
-void removal(Node* n, int side);
-//void delete_one_child(Node* &head, Node* n);
-//void delete_case1(Node* &head, Node* n);
-//void delete_case2(Node* &head, Node* n);
-//void delete_case3(Node* &head, Node* n);
-//void delete_case4(Node* &head, Node* n);
-//void delete_case5(Node* &head, Node* n);
-//void delete_case6(Node* &head, Node* n);
-Node* findPre(Node* n);
-bool isBlack(Node* n);
+
 //Constants for red or black
 const int BLACK = 0;
 const int RED = 1;
@@ -68,7 +55,7 @@ int main() {
   cout << "Welcome to Red Black Tree! Where coders go to die." << endl;
   while(running == true) {
     
-    cout << "Would you like to read in numbers 'manually' or from a 'file' or 'print' or 'search' or 'delete' or 'quit'?" << endl;
+    cout << "Would you like to read in numbers 'manually' or from a 'file' or 'print' or 'search' or 'quit'?" << endl;
     char answer[10];
     cin >> answer;
     if(strcmp(answer, "manually") == 0) {
@@ -76,7 +63,6 @@ int main() {
       Node* newNode = new Node;
       cout << "Input a number" << endl;
       cin >> newNode->data;
-      counter++;
       insert(head, newNode);
     }
     else if(strcmp(answer, "file") == 0) {
@@ -132,18 +118,6 @@ int main() {
       cout << "What number do you want to search for?" << endl;
       cin >> number;
       search(head, number, counter);
-    }
-    else if(strcmp(answer, "delete") == 0) {
-      int number;
-      cout << "What number do you want to delete?" << endl;
-      cin >> number;
-      head = remove(head, number);
-      
-      if(head == NULL || head->data == 0) {
-	delete head;
-	head = NULL;
-	break;
-      }
     }
     else {
       cout << "That wasn't one of the options..." << endl;
@@ -235,7 +209,6 @@ void rotate_left(Node* &head, Node* n) {
     if(n == head) {
       head = nNew;
       head->color = BLACK;
-      head->parent = NULL;
     }
   }
 }
@@ -265,7 +238,6 @@ void rotate_right(Node* &head, Node* n) {
     if(n == head) {
       head = nNew;
       head->color = BLACK;
-      head->parent = NULL;
     }
   }
 }
@@ -340,7 +312,6 @@ void insert_repair_tree(Node* &head, Node* n) {
 
 //if the node entered is the head then make it black
 void case1(Node* &head, Node* n) {
-  cout << "INSERT 1" << endl;
   if(n->parent == NULL) {
     n->color = BLACK;
   }
@@ -348,13 +319,11 @@ void case1(Node* &head, Node* n) {
 
 //if the node entered has a black parent then you are all gucci
 void case2(Node* &head, Node* n) {
-  cout << "INSERT 2" <<endl;
   return;
 }
 
 //Parent and uncle are red
 void case3(Node* &head, Node* n) {
-  cout << "INSERT 3" <<endl;
   parent(n)->color = BLACK;
   uncle(n)->color = BLACK;
   if(grandparent(n) != head) {
@@ -365,7 +334,6 @@ void case3(Node* &head, Node* n) {
 
 //Basically every other possibility
 void case4(Node* &head, Node* n) {
-  cout << "INSERT 4" <<endl;
   Node* p = parent(n);
   Node* g = grandparent(n);
   
@@ -391,7 +359,6 @@ void case4(Node* &head, Node* n) {
       g->right = p->left;
       p->left = g;
       head = p;
-      head->parent = NULL;
       p->right = n;
       n->parent = p;
       p->color = BLACK;
@@ -426,7 +393,6 @@ void case4(Node* &head, Node* n) {
 
 //rotates to the right or the left around the grandparent is needed and changes color
 void case4Part2(Node* &head, Node* n) {
-  cout << "INSERT 4 P 2" <<endl;
   Node* p = parent(n);
   Node* g = grandparent(n);
   
@@ -452,229 +418,113 @@ void search(Node* head, int number, int counter) {
 	cout << "That number is not in the tree" << endl;
 	return;
       }
-      else {
-	search(head->left, number, counter);
-	num++;
-	search(head->right, number, counter);
-	num++;
-      }
+      search(head->left, number, counter);
+      num++;
+      search(head->right, number, counter);
+      num++;
     }
   }
 }
 
-//Returns the searched for number in the tree
-Node* searchReturn(Node* head, int number) {
-  if(head->data == number) {
-    return head;
-  }
-  if(number > head->data) {
-    return searchReturn(head->right, number);
+
+void replace_node(Node* n, Node* child) {
+  child->parent = n->parent;
+  if(n == n->parent->left) {
+    child->parent->right = child;
   }
   else {
-    return searchReturn(head->left, number);
+    child->parent->right = child;
   }
 }
 
-
-Node* replace_node(Node* old, Node* newNode) {
-  //if the node being replaced is not the head
-  if(parent(old) != NULL) {
-    newNode->parent = parent(old);
-
-    if(parent(old)->right == old) {
-      parent(old)->right = newNode;
-    }
-    else {
-      parent(old)->left = newNode;
-    }
-    old->parent = NULL;
-    return old;
-  }
-  //If the node being replaced is the root, change the root's data
-  else {
-    old->data = newNode->data;
-    old->left = newNode->left;
-    old->right = newNode->right;
-    if(old->left != NULL) {
-      old->left->parent = old;
-    }
-    if(old->right != NULL) {
-      old->right->parent = old;
-    }
-    return newNode;
-  }
-}
-
-//Finds if the node is black or not
-bool isBlack(Node* n) {
-  if(n == NULL) {
-    return true;
-  }
-  else if(n->color == BLACK) {
-    return true;
+//deletes one child
+void delete_one_child(Node* n) {
+  Node* child = new Node;
+  //If right is null then child is left, otherwise child is right
+  if(n->right == NULL) {
+    child = n->left;
   }
   else {
-    return false;
+    child = n->right;
   }
-}
 
-//removes the node from the tree
-void removal(Node* n, int side) {
-  //if then node being removed is the root, special case
-  if(side != 0) {
-    //if the sibling is red
-    if(isBlack(sibling(n)) == false) {
-      //switch the parent and sibling colors
-      sibling(n)->color = BLACK;
-      parent(n)->color = RED;
-      
-      //roteat around parent, making sibling the grandparent
-      if(side == 2) {
-	rotate_right(head, parent(n));
-      }
-      else {
-	rotate_left(head, parent(n));
-      }
-    }
-
-    //sibling is black
-    //if siblings children are black
-    if(isBlack(sibling(n)->right) == true && isBlack(sibling(n)->left) == true) {
-      //if n is black
-      if(isBlack(n) == true) {
-	//balance tree by making sibling red
-	sibling(n)->color = RED;
-	
-	//basically this section of the tree is unbalanced relative to the entire tree
-	//so call recursively on n's parent
-	if(grandparent(n) != NULL) {
-	  removal(parent(n), 0);
-	}
-	else if(grandparent(n)->right == parent(n)) {
-	  removal(parent(n), 2);
-	}
-	else {
-	  removal(parent(n), 1);
-	}
-	return;
-      }
-      
-      //the parent is red
-      else {
-	parent(n)->color = BLACK;
-	sibling(n)->color = RED;
-	return;
-      } 
-    }
-
-    //n sibling has to have one red child
-    
-    if(side == 2 && (isBlack(sibling(n)->right) == true) && (isBlack(sibling(n)->left) == false)) {
-      sibling(n)->right->color = BLACK;
-      sibling(n)->color = RED;
-      rotate_left(head, sibling(n));
-    }
-    else if(side == 1 && (isBlack(sibling(n)->left) == true) && (isBlack(sibling(n)->right) == false)) {
-      sibling(n)->left->color = BLACK;
-      sibling(n)->color = RED;
-      rotate_right(head, sibling(n));
-    }
-
-    //outside child of n sibling has to be red now
-
-    //finish balancing tree
-    sibling(n)->color = parent(n)->color;
-    parent(n)->color = BLACK;
-    if(side == 2) {
-      sibling(n)->left->color = BLACK;
-      rotate_right(head, parent(n));
-    }
-    else {
-      sibling(n)->right->color = BLACK;
-      rotate_left(head, parent(n));
-    }
-  }
-}
-
-//returns the tree after removing
-Node* remove(Node* head, int removing) {
-  Node* deleting = searchReturn(head, removing);
-  
-  if(deleting != NULL) {
-    //If there are two children for the node being deleted
-    if(deleting->right != NULL && deleting->left != NULL) {
-      //Find the next smallest number
-      Node* replacement = deleting->left;
-      while(replacement->right != NULL) {
-	replacement = replacement->right;
-      }
-      //replace the node
-      deleting->data = replacement->data;
-      deleting = replacement;
-    }
-    
-    int side = 0;
-    //find if deleting is left or right child (2 = left, 1 = right)
-    if(parent(deleting) != NULL) {
-      if(deleting == parent(deleting)->right) {
-	side = 2;
-      }
-      else {
-	side = 1;
-      }
-    }
-
-    //if deleting is red, it can be deleted
-    if(isBlack(deleting) == false) {
-      if(side == 1) {
-	parent(deleting)->right = NULL;
-      }
-      else if(side == 2) {
-	parent(deleting)->left = NULL;
-      }
-    }
-    //deleting is black with two kids
-    else if(deleting->right != NULL || deleting->left != NULL) {
-      //child is whichever child of deleting isn't null
-      Node* child = new Node;
-      if(deleting->right != NULL) {
-	child = deleting->right;
-      }
-      else {
-	child = deleting->left;
-      }
-      
+  replace_node(n, child);
+  if(n->color == BLACK) {
+    if(child->color == RED) {
       child->color = BLACK;
-      deleting = replace_node(deleting, child);
     }
-    //deleting is black with no kids
     else {
-      removal(deleting, side);
-    }
-    
-
-    //If its the root then special case
-    if(parent(deleting) == NULL) {
-      deleting->data = 0;
-    }
-    //if its not you can delete it
-    else {
-      if(side == 2 && parent(deleting) != NULL) {
-	parent(deleting)->right = NULL;
-      }
-      else if(side == 1 && parent(deleting) != NULL) {
-	parent(deleting)->left = NULL;
-      }
-      delete deleting;
+      delete_case1(child);
     }
   }
-  else {
-    cout << "That number wasn't in the tree" << endl;
-  }
-
-  while(parent(head) != NULL) {
-    head = parent(head);
-  }
-  return head;
+  delete n;
 }
 
+void delete_case1(Node* n) {
+  if(n->parent != NULL) {
+    delete_case2(n);
+  }
+}
+
+void delete_case2(Node* n) {
+  Node* s = sibling(n);
+
+  if(s->color == RED) {
+    n->parent->color = RED;
+    s->color = BLACK;
+    if(n->parent != NULL && n->parent->left != NULL && n == n->parent->left) {
+      rotate_left(n->parent);
+    }
+    else {
+      rotate_right(n->parent);
+    }
+  }
+  delete_case3(n);
+}
+
+void delete_case3(Node* n) {
+  Node* s = sibing(n);
+
+  if((n->parent != NULL) && (n->parent->color == BLACK) && 
+     (s->color == BLACK) &&
+     (s->left != NULL) && (s->left->color == BLACK) && 
+     (s->right != NULL) && (s->right->color == BLACK)) {
+    s->color = RED;
+    delete_case1(n->parent);
+  }
+  else {
+    delete_case4(n);
+  }
+}
+
+void delete_case4(Node* n) {
+  Node* s = sibling(n);
+  
+  if((n->parent != NULL) && (n->parent->color == RED) &&
+     (s->color == BLACK) &&
+     (s->left != NULL) && (s->left->color == BLACK) && 
+     (s->right != NULL) && (s->right->color == BLACK)) {
+    s->color = RED;
+    n->parent->color = BLACK;
+  }
+  else {
+    delete_case5(n);
+  }
+}
+
+void delete_case5(Node* n) {
+  Node* s = sibling(n);
+
+  if(s->color == BLACK) {
+    if((n->parent != NULL) && (n->parent->left != NULL) && (n == n->parent->left) &&
+       (s->right != NULL) && (s->right->color == BLACK) &&
+       (s->left != NULL) && (s->left->color == BLACK)) {
+      s->color = RED;
+      s->left->color = BLACK;
+      rotate_right(s);
+    }
+    else if(n->parent != NULL && n->parent->right != NULL) && (n == n->parent->right)) {
+      
+    }
+  }
+}
