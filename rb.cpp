@@ -6,7 +6,7 @@
 using namespace std;
 
 /* Author: Austin Holst
- * Date: 4 - 30 - 18
+ * Date: 5 - 22 - 18
  * Code: Creates and prints out a red black data tree from user input. Let's you delete any nodes that you want.
  * Note: Big shout out to Raveen for showing me the two function delete structure
  */
